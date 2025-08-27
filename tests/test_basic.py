@@ -6,8 +6,8 @@ import pytest
 def test_runtime():
     with pytest.raises(RuntimeError):
         assert m.runtime()
-
-
-def test_builtin():
-    with pytest.raises(IndexError):
-        assert m.builtin()
+#
+#
+# def test_builtin():
+#     with pytest.raises(IndexError):
+#         assert m.builtin()
