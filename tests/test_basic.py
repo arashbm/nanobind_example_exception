@@ -1,4 +1,13 @@
 import nanobind_example as m
 
-def test_add():
-    assert m.add(1, 2) == 3
+import pytest
+
+
+def test_runtime():
+    with pytest.raises(RuntimeError):
+        assert m.runtime()
+
+
+def test_builtin():
+    with pytest.raises(IndexError):
+        assert m.builtin()

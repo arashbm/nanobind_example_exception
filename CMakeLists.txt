@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.15...3.26)
 
 project(nanobind_example LANGUAGES CXX)
 
-if (NOT SKBUILD)
-  message(WARNING "\
+if(NOT SKBUILD)
+  message(
+    WARNING
+      "\
   This CMake file is meant to be executed using 'scikit-build'. Running
   it directly will almost certainly not produce the desired result. If
   you are a user trying to install this package, please use the command
@@ -26,34 +28,24 @@ if (NOT SKBUILD)
 endif()
 
 # Try to import all Python components potentially needed by nanobind
-find_package(Python 3.8
-  REQUIRED COMPONENTS Interpreter Development.Module
+find_package(
+  Python 3.10 REQUIRED
+  COMPONENTS Interpreter Development.Module
   OPTIONAL_COMPONENTS Development.SABIModule)
+
+if(NOT DEFINED SKBUILD)
+  execute_process(
+    COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE nanobind_ROOT)
+endif()
 
 # Import nanobind through CMake's find_package mechanism
 find_package(nanobind CONFIG REQUIRED)
 
 # We are now ready to compile the actual extension module
-nanobind_add_module(
-  # Name of the extension
-  nanobind_example_ext
-
-  # Target the stable ABI for Python 3.12+, which reduces
-  # the number of binary wheels that must be built. This
-  # does nothing on older Python versions
-  STABLE_ABI
-
-  # Build libnanobind statically and merge it into the
-  # extension (which itself remains a shared library)
-  #
-  # If your project builds multiple extensions, you can
-  # replace this flag by NB_SHARED to conserve space by
-  # reusing a shared libnanobind across libraries
-  NB_STATIC
-
-  # Source code goes here
-  src/nanobind_example_ext.cpp
-)
+nanobind_add_module(nanobind_example_ext STABLE_ABI NB_STATIC
+                    src/nanobind_example_ext.cpp)
 
 # Install directive for scikit-build-core
 install(TARGETS nanobind_example_ext LIBRARY DESTINATION nanobind_example)
